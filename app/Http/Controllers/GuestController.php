@@ -4,14 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class CriadorHomeController extends Controller
+class GuestController extends Controller
 {
     public function index()
     {
-        if (auth()->user()->role !== 'criador') {
+        if (auth()->user()->role !== 'convidado') {
             return redirect()->route('dashboard')->with('error', 'Acesso negado.');
         }
 
-        return view('criador-home');
+        return view('guest-home');
     }
 }
