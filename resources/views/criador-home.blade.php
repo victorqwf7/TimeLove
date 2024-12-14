@@ -16,6 +16,13 @@
             <p class="text-center text-lg">
                 Este é o ponto de partida para o conteúdo exclusivo dos criadores.
             </p>
+            <!-- Botão para ir para a página de dashboard -->
+            <div class="mt-4 text-center">
+                <a href="{{ route('dashboard') }}" class="inline-block py-2">
+                    Ir para página de dashboard.
+                </a>
+            </div>
         </div>
+
     </div>
 </x-app-layout>

@@ -10,6 +10,13 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     {{ __("You're logged in!") }}
+                    
+                    <!-- Botão para ir para a página de criador-home -->
+                    <div class="mt-4">
+                        <a href="{{ route('criador-home') }}" class="inline-block py-2">
+                            Ir para página inicial de criador.
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
