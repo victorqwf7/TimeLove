@@ -18,14 +18,15 @@
 <div class="h-screen flex flex-col">
     <!-- Main Content -->
     <main class="">
-        <section class="flex justify-center min-h-screen mt-20 text-white">
+        <section class="flex justify-center min-h-screen mt-32 text-white">
             <div class="fade-in">
                 <div class="justify-items-center">
                     <p class="text-2xl">Bem-vinda, {{ auth()->user()->name }}!</p>
                 </div>
                 <div class="m-8 justify-items-center">
-                    <p class="text">Esta é a tela de convidados. Vamos ver o que seu amor preparou para você no
-                        TimeLove.
+                    <p class="text">Esta é a tela de convidados.</p>
+                    <p class="text">Vamos ver o que seu amor preparou para você no
+                        TimeLove?
                     </p>
                 </div>
             </div>
