@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CriadorHomeController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\CapsuleController;
+use App\Http\Controllers\StoryController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -61,6 +62,17 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/capsules/{capsule}', [CapsuleController::class, 'destroy'])->name('capsules.destroy');
 });
 
+Route::middleware(['auth'])->group(function () {
+    // Rota para criar (inserir) uma story
+    Route::post('/capsules/{capsule}/stories', [StoryController::class, 'store'])->name('stories.store');
+});
 
+// Rota para o player do story
+Route::middleware(['auth'])->group(function () {
+    // Outras rotas...
+
+    // Rota para o Player de Stories
+    Route::get('/capsules/{capsule}/stories/player', [StoryController::class, 'player'])->name('stories.player');
+});
 
 require __DIR__ . '/auth.php';

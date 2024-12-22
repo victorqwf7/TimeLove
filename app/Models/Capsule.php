@@ -9,7 +9,12 @@ class Capsule extends Model
 {
     use HasFactory;
 
-    protected $table = 'capsules'; 
+    protected $table = 'capsules';
     protected $fillable = ['user_id', 'name', 'theme'];
-    
+
+
+    public function stories()
+    {
+        return $this->hasMany(Story::class);
+    }
 }

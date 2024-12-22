@@ -24,8 +24,14 @@ class CapsuleController extends Controller
         if ($capsule->user_id !== auth()->id()) {
             abort(403, 'Acesso negado');
         }
+        // Carrega as stories associadas à cápsula
+        // (pode ordenar por created_at, se quiser)
+        $stories = $capsule->stories()->orderBy('created_at', 'desc')->get();
 
-        return view('capsules.show', compact('capsule'));
+        return view('capsules.show', [
+            'capsule' => $capsule,
+            'stories' => $stories,
+        ]);
     }
 
     public function store(Request $request)

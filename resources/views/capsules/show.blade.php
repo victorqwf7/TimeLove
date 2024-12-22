@@ -60,7 +60,50 @@
             </form>
         </div>
     </div>
-    
+
+
+    <!-- STORIES -->
+    <form method="POST" action="{{ route('stories.store', $capsule->id) }}" enctype="multipart/form-data">
+        @csrf
+        <div class="mb-4">
+            <label for="media_file">Selecione a Foto ou Vídeo</label>
+            <input type="file" id="media_file" name="media_file" accept="image/*,video/*" required>
+        </div>
+
+        <div class="mb-4">
+            <label for="duration">Duração (segundos)</label>
+            <input type="number" id="duration" name="duration" min="1" max="30">
+        </div>
+
+        <button type="submit">Criar Story</button>
+    </form>
+
+
+    <h2 class="text-2xl font-bold mt-6 mb-2">Meus Stories</h2>
+
+    @if($stories->isEmpty())
+        <p class="text-gray-300">Nenhuma story adicionada ainda.</p>
+    @else
+        @foreach($stories as $story)
+            <div class="mb-4">
+                @if($story->media_type === 'image')
+                    <img src="{{ asset('storage/' . $story->media_path) }}" alt="Minha Foto" />
+                @elseif($story->media_type === 'video')
+                    <video controls>
+                        <source src="{{ asset('storage/' . $story->media_path) }}" type="video/mp4">
+                        Seu navegador não suporta vídeo HTML5.
+                    </video>
+                @endif
+                <p class="text-gray-400 text-sm">
+                    Duração: {{ $story->duration }}s
+                </p>
+                <p class="text-gray-400 text-sm">
+                    Criado em: {{ $story->created_at->format('d/m/Y H:i') }}
+                </p>
+            </div>
+        @endforeach
+    @endif
+
 
     <!-- Link para voltar à listagem ou outra página -->
     <div class="mt-6 fade-in" style="--delay: 0.8s">
