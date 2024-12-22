@@ -32,21 +32,32 @@
             </div>
         </section>
         <section class="flex flex-col mb-20 text-black bg-slate-200 rounded-lg">
-            <!-- Primeira Linha -->
-            <div class="flex justify-start items-center gap-2 p-4 bg-slate-200">
-                <h1 class="text-4xl scroll-fade-in" style="--delay: 0.3s">O que está</h1>
-                <h1 class="text-4xl scroll-fade-in" style="--delay: 0.8s">te esperando?</h1>
-            </div>
-            <div class="flex justify-around my-10">
-                <!-- Primeiro Botão -->
-                <button class="p-8 bg-slate-900 rounded-lg m-2 text-white hover:text-rose-500 transition duration-300">
-                    Cápsula do Tempo
-                </button>
+            <!-- Wrapper para aplicar fade-in em tudo -->
+            <div class="scroll-fade-in" style="--delay: 0.2s">
+                <!-- Primeira Linha -->
+                <div class="flex justify-start items-center gap-2 p-4 bg-slate-200">
+                    <h1 class="text-4xl scroll-fade-in" style="--delay: 0.3s">O que</h1>
+                    <h1 class="text-4xl scroll-fade-in" style="--delay: 0.4s">está</h1>
+                    <h1 class="text-4xl scroll-fade-in" style="--delay: 0.5s">te</h1>
+                    <h1 class="text-4xl scroll-fade-in" style="--delay: 0.9s">esperando?</h1>
+                </div>
 
-                <!-- Segundo Botão -->
-                <button class="p-8 bg-slate-900 rounded-lg m-2 text-white hover:text-rose-500 transition duration-300">
-                    Linha do Tempo
-                </button>
+                <!-- Botões com animação -->
+                <div class="flex justify-around my-10">
+                    <!-- Primeiro Botão -->
+                    <button
+                        class="p-8 bg-slate-900 rounded-lg m-2 text-white hover:text-rose-500 transition duration-300 scroll-fade-in"
+                        style="--delay: 1.2s">
+                        Cápsula do Tempo
+                    </button>
+
+                    <!-- Segundo Botão -->
+                    <button
+                        class="p-8 bg-slate-900 rounded-lg m-2 text-white hover:text-rose-500 transition duration-300 scroll-fade-in"
+                        style="--delay: 1.5s">
+                        Linha do Tempo
+                    </button>
+                </div>
             </div>
         </section>
     </main>

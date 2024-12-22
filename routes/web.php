@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CriadorHomeController;
 use App\Http\Controllers\GuestController;
+use App\Http\Controllers\CapsuleController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -37,5 +38,29 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth'])->get('/criador-home', [CriadorHomeController::class, 'index'])->name('criador-home');
 // Rota para a página de convidados, acessível somente por convidados
 Route::middleware(['auth'])->get('/guest-home', [GuestController::class, 'index'])->name('guest-home');
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/capsule/store', [CapsuleController::class, 'store'])->name('capsule.store');
+});
+
+Route::get('/capsules', [CapsuleController::class, 'index'])->name('capsules.index');
+
+Route::get('/capsules/{capsule}', [CapsuleController::class, 'show'])->name('capsules.show');
+
+// Grupo com middleware de autenticação, caso esteja usando
+Route::middleware(['auth'])->group(function () {
+    // ... outras rotas
+
+    // Rota para editar (exibe o formulário de edição)
+    Route::get('/capsules/{capsule}/edit', [CapsuleController::class, 'edit'])->name('capsules.edit');
+
+    // Rota para atualizar (envia o formulário de edição)
+    Route::put('/capsules/{capsule}', [CapsuleController::class, 'update'])->name('capsules.update');
+
+    // Rota para excluir
+    Route::delete('/capsules/{capsule}', [CapsuleController::class, 'destroy'])->name('capsules.destroy');
+});
+
+
 
 require __DIR__ . '/auth.php';

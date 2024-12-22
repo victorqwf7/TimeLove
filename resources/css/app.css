@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
- 
+
 
 /* Animação fade-in com movimento */
 @keyframes fadeInMove {
@@ -46,6 +46,7 @@
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -53,13 +54,19 @@
 }
 
 .scroll-fade-in {
-    opacity: 0; /* Começa invisível */
-    transform: translateY(20px); /* Começa deslocado */
+    opacity: 0;
+    /* Começa invisível */
+    transform: translateY(20px);
+    /* Começa deslocado */
     transition: opacity 0.5s ease-out, transform 0.5s ease-out;
 }
 
 .scroll-fade-in.show {
-    opacity: 1; /* Fica visível */
-    transform: translateY(0); /* Volta para posição original */
-    transition-delay: var(--delay, 10s); /* Delay customizável */
+    opacity: 1;
+    /* Fica visível */
+    transform: translateY(0);
+    /* Volta para posição original */
+    transition-delay: var(--delay, 10s);
+    /* Delay customizável */
 }
+
