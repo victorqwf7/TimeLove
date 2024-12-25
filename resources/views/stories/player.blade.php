@@ -1,44 +1,45 @@
 @extends('layouts.criador-layout')
 
 @section('content')
-<div class="container mx-auto px-4 py-6 text-white">
-    <!-- Título da página -->
-    <h1 class="text-3xl font-bold mb-6">Player de Stories - {{ $capsule->name }}</h1>
-
+<div class="relative w-full h-screen overflow-hidden">
     <!-- Player de Stories -->
-    <!-- Player de Stories -->
-    <div id="story-player" class="relative w-full h-screen bg-black flex items-center justify-center">
+    <div id="story-player" class="relative w-full h-full">
         <!-- Barra de Progresso -->
-        <div class="progress-container">
+        <div class="progress-container fixed top-4 left-4 right-4 flex gap-2 z-50">
             @foreach($stories as $index => $story)
-                <div class="progress-bar">
-                    <div class="progress-bar-inner" data-index="{{ $index }}"></div>
+                <div class="progress-bar flex-1 bg-gray-300 rounded-full overflow-hidden">
+                    <div class="progress-bar-inner bg-blue-500 h-full transition-all duration-linear"
+                        data-index="{{ $index }}"></div>
                 </div>
             @endforeach
         </div>
 
-        <div id="story-content" class="w-full h-full flex items-center justify-center">
+        <!-- Conteúdo da Story -->
+        <div id="story-content" class="absolute inset-0 flex items-center justify-center z-10">
             <!-- O conteúdo da story (imagem ou vídeo) será injetado aqui via JavaScript -->
         </div>
-        <!-- Removido os botões de navegação -->
     </div>
 
     <!-- Adicionar o CSS aqui -->
     <style>
         /* Barra de Progresso */
         .progress-container {
-            position: absolute;
+            /* Fixed position ensures it stays on top */
+            position: fixed;
             top: 10px;
             left: 10px;
             right: 10px;
             display: flex;
             gap: 2px;
+            z-index: 50;
+            /* Alta prioridade para sobrepor as mídias */
         }
 
         .progress-bar {
             flex: 1;
             height: 4px;
             background-color: rgba(255, 255, 255, 0.3);
+            /* Cor base da barra */
             border-radius: 2px;
             overflow: hidden;
         }
@@ -53,7 +54,8 @@
 
         /* Estilização do Player */
         #story-player {
-            /* background-color: rgba(50, 50, 50, 0.95); Removido para eliminar o fundo */
+            background-color: transparent;
+            /* Fundo transparente */
             position: relative;
             width: 100%;
             height: 100vh;
@@ -63,13 +65,14 @@
             justify-content: center;
         }
 
+        /* Estilização das Mídias */
         #story-content img,
         #story-content video {
             border-radius: 8px;
-            max-width: 90%;
-            /* Limita a largura máxima */
-            max-height: 90%;
-            /* Limita a altura máxima */
+            max-width: 100%;
+            /* Ocupa todo o espaço horizontal disponível */
+            max-height: 100%;
+            /* Ocupa todo o espaço vertical disponível */
             object-fit: contain;
             /* Mantém a proporção sem distorcer */
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
@@ -77,44 +80,29 @@
             transition: opacity 0.5s ease-in-out;
             /* Transição suave */
             opacity: 0;
+            /* Inicialmente invisível */
+            z-index: 10;
+            /* Inferior ao progress-container */
         }
 
         #story-content img.show,
         #story-content video.show {
             opacity: 1;
-        }
-
-        #prev-story::before,
-        #next-story::before {
-            content: '';
-            display: inline-block;
-            width: 1em;
-            height: 1em;
-            background-size: contain;
-            background-repeat: no-repeat;
-        }
-
-        #prev-story::before {
-            background-image: url('data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjZmZmIiBoZWlnaHQ9IjE2IiB2aWV3Qm94PSIwIDAgMTYgMTYiIHdpZHRoPSIxNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMu/b3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTAuODUgMTAgNy45NjQgNC45NTQgMTMuNDkgOS4wNjcgMS4zMjIgNi44NTkgNy4yNzIgOS45OTUgMS45NTRrLTUuNjk2IDQuNjA4Ii8+PC9zdmc+');
-        }
-
-        #next-story::before {
-            background-image: url('data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjZmZmIiBoZWlnaHQ9IjE2IiB2aWV3Qm94PSIwIDAgMTYgMTYiIHdpZHRoPSIxNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMu/b3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTAuODUgMTAgNy45NjQgMTAuMTA4IDMuMTE4IDE1LjA5M0gxMC44NSIgLz48L3N2Zz4=');
+            /* Visível quando a classe 'show' é adicionada */
         }
 
         /* Responsividade */
         @media (max-width: 768px) {
-
-            #prev-story,
-            #next-story {
-                padding: 8px;
-                font-size: 2rem;
+            .progress-container {
+                top: 2rem;
+                left: 1rem;
+                right: 1rem;
             }
 
             #story-content img,
             #story-content video {
-                max-width: 95%;
                 max-height: 80%;
+                /* Reduz a altura máxima em dispositivos menores */
             }
         }
     </style>
@@ -125,9 +113,6 @@
             let currentIndex = 0;
             let timer;
             const storyContent = document.getElementById('story-content');
-            const prevButton = document.getElementById('prev-story');
-            const nextButton = document.getElementById('next-story');
-
             const progressBars = document.querySelectorAll('.progress-bar-inner');
 
             function showStory(index) {
@@ -157,18 +142,17 @@
                 storyContent.innerHTML = '';
 
                 // Verifica o tipo de mídia e cria o elemento correspondente
-                // Dentro da função showStory()
                 if (story.media_type === 'image') {
                     const img = document.createElement('img');
                     img.src = "{{ asset('storage') }}/" + story.media_path;
-                    img.alt = "Story Image";
-                    img.classList.add('max-w-full', 'max-h-full', 'object-contain', 'rounded-lg', 'show');
+                    img.alt = "Story da Cápsula {{ $capsule->name }} - {{ $index + 1 }} de {{ $stories->count() }}";
+                    img.classList.add('show');
                     storyContent.appendChild(img);
                 } else if (story.media_type === 'video') {
                     const video = document.createElement('video');
                     video.src = "{{ asset('storage') }}/" + story.media_path;
                     video.autoplay = true;
-                    video.classList.add('max-w-full', 'max-h-full', 'object-contain', 'rounded-lg', 'show');
+                    video.classList.add('show');
                     storyContent.appendChild(video);
                 }
 
