@@ -24,13 +24,13 @@
 
 <section class="flex flex-col items-center mt-10 text-white">
     <!-- Título da página -->
-    <h1 class="text-4xl font-bold mb-6 fade-in" style="--delay: 0.3s">Criar Cápsula do Tempo</h1>
+    <h1 class="text-center text-4xl font-bold mb-6 fade-in" style="--delay: 0.3s">Criar Cápsula do Tempo</h1>
     <p class="text-center mb-8 text-gray-300 fade-in" style="--delay: 0.8s">
         Crie um álbum temático e adicione fotos e vídeos para guardar memórias especiais.
     </p>
 
     <!-- Formulário para criar uma cápsula -->
-    <form method="POST" action="{{ route('capsule.store') }}"
+    <form method="POST" action="{{ route('capsules.store') }}"
         class="w-full max-w-lg bg-slate-900 p-6 rounded-lg shadow-lg fade-in" style="--delay: 0.8s">
         @csrf
         <!-- Nome da cápsula -->
@@ -74,7 +74,7 @@
 <div class="mt-4 text-white text-center fade-in" style="--delay: 4s">
     <a href="{{ route('capsules.index') }}"
         class="inline-block py-2 underline text-rose-500 hover:text-rose-700 transition">
-        Ir para minha capsulas
+        Ver minhas cápsulas
     </a>
 </div>
 

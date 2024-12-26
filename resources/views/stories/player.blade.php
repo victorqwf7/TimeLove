@@ -1,6 +1,109 @@
 @extends('layouts.criador-layout')
 
 @section('content')
+
+<!-- Adicionar o CSS aqui -->
+<style>
+    /* Barra de Progresso */
+    .progress-container {
+        /* Fixed position ensures it stays on top */
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        display: flex;
+        gap: 2px;
+        z-index: 50;
+        /* Alta prioridade para sobrepor as mídias */
+    }
+
+    .progress-bar {
+        flex: 1;
+        height: 4px;
+        background-color: rgba(255, 255, 255, 0.3);
+        /* Cor base da barra */
+        border-radius: 2px;
+        overflow: hidden;
+    }
+
+    .progress-bar-inner {
+        height: 100%;
+        width: 0%;
+        background-color: #3b82f6;
+        /* Azul do Tailwind */
+        transition: width linear;
+    }
+
+    /* Estilização do Player */
+    #story-player {
+        background-color: transparent;
+        /* Fundo transparente */
+        position: relative;
+        width: 100%;
+        height: 100vh;
+        /* Ocupa toda a altura da janela */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Estilização das Mídias */
+    #story-content img,
+    #story-content video {
+        border-radius: 8px;
+        max-width: 100%;
+        /* Ocupa todo o espaço horizontal disponível */
+        max-height: 100%;
+        /* Ocupa todo o espaço vertical disponível */
+        object-fit: contain;
+        /* Mantém a proporção sem distorcer */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        /* Sombra para destacar */
+        transition: opacity 0.5s ease-in-out;
+        /* Transição suave */
+        opacity: 0;
+        /* Inicialmente invisível */
+        z-index: 10;
+        /* Inferior ao progress-container */
+    }
+
+    #story-content img.show,
+    #story-content video.show {
+        opacity: 1;
+        /* Visível quando a classe 'show' é adicionada */
+    }
+
+    #story-description {
+        position: absolute;
+        top: 60px;
+        /* Ajuste conforme a barra de progresso */
+        left: 0;
+        right: 0;
+        text-align: center;
+        color: white;
+        font-size: 1rem;
+        font-weight: 500;
+        z-index: 20;
+        padding: 8px 12px;
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+        .progress-container {
+            top: 2rem;
+            left: 1rem;
+            right: 1rem;
+        }
+
+        #story-content img,
+        #story-content video {
+            max-height: 80%;
+            /* Reduz a altura máxima em dispositivos menores */
+        }
+    }
+</style>
+
+
 <div class="relative w-full h-screen overflow-hidden">
     <!-- Player de Stories -->
     <div id="story-player" class="relative w-full h-full">
@@ -14,104 +117,27 @@
             @endforeach
         </div>
 
-        <!-- Conteúdo da Story -->
+        <!-- Descrição do Story -->
+        <div id="story-description"
+            class="absolute top-14 left-0 right-0 text-center text-white">
+            <!-- A descrição será injetada aqui via JavaScript -->
+        </div>
+
+        <!-- Conteúdo do Story -->
         <div id="story-content" class="absolute inset-0 flex items-center justify-center z-10">
             <!-- O conteúdo da story (imagem ou vídeo) será injetado aqui via JavaScript -->
         </div>
     </div>
 
-    <!-- Adicionar o CSS aqui -->
-    <style>
-        /* Barra de Progresso */
-        .progress-container {
-            /* Fixed position ensures it stays on top */
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            right: 10px;
-            display: flex;
-            gap: 2px;
-            z-index: 50;
-            /* Alta prioridade para sobrepor as mídias */
-        }
 
-        .progress-bar {
-            flex: 1;
-            height: 4px;
-            background-color: rgba(255, 255, 255, 0.3);
-            /* Cor base da barra */
-            border-radius: 2px;
-            overflow: hidden;
-        }
 
-        .progress-bar-inner {
-            height: 100%;
-            width: 0%;
-            background-color: #3b82f6;
-            /* Azul do Tailwind */
-            transition: width linear;
-        }
-
-        /* Estilização do Player */
-        #story-player {
-            background-color: transparent;
-            /* Fundo transparente */
-            position: relative;
-            width: 100%;
-            height: 100vh;
-            /* Ocupa toda a altura da janela */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Estilização das Mídias */
-        #story-content img,
-        #story-content video {
-            border-radius: 8px;
-            max-width: 100%;
-            /* Ocupa todo o espaço horizontal disponível */
-            max-height: 100%;
-            /* Ocupa todo o espaço vertical disponível */
-            object-fit: contain;
-            /* Mantém a proporção sem distorcer */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-            /* Sombra para destacar */
-            transition: opacity 0.5s ease-in-out;
-            /* Transição suave */
-            opacity: 0;
-            /* Inicialmente invisível */
-            z-index: 10;
-            /* Inferior ao progress-container */
-        }
-
-        #story-content img.show,
-        #story-content video.show {
-            opacity: 1;
-            /* Visível quando a classe 'show' é adicionada */
-        }
-
-        /* Responsividade */
-        @media (max-width: 768px) {
-            .progress-container {
-                top: 2rem;
-                left: 1rem;
-                right: 1rem;
-            }
-
-            #story-content img,
-            #story-content video {
-                max-height: 80%;
-                /* Reduz a altura máxima em dispositivos menores */
-            }
-        }
-    </style>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const stories = @json($stories);
             let currentIndex = 0;
             let timer;
+            const storyDescription = document.getElementById('story-description');
             const storyContent = document.getElementById('story-content');
             const progressBars = document.querySelectorAll('.progress-bar-inner');
 
@@ -133,19 +159,19 @@
 
                 // Preencher a barra de progresso atual
                 const currentBar = progressBars[currentIndex];
-                // Forçar reflow para reiniciar a transição
-                void currentBar.offsetWidth;
+                void currentBar.offsetWidth; // Força reflow
                 currentBar.style.transition = 'width ' + (story.duration || 5) + 's linear';
                 currentBar.style.width = '100%';
 
                 // Limpa o conteúdo anterior
+                storyDescription.innerHTML = ''; // Limpa a descrição anterior
                 storyContent.innerHTML = '';
 
                 // Verifica o tipo de mídia e cria o elemento correspondente
                 if (story.media_type === 'image') {
                     const img = document.createElement('img');
                     img.src = "{{ asset('storage') }}/" + story.media_path;
-                    img.alt = "Story da Cápsula {{ $capsule->name }} - {{ $index + 1 }} de {{ $stories->count() }}";
+                    img.alt = "Story da Cápsula {{ $capsule->name }}";
                     img.classList.add('show');
                     storyContent.appendChild(img);
                 } else if (story.media_type === 'video') {
@@ -154,6 +180,13 @@
                     video.autoplay = true;
                     video.classList.add('show');
                     storyContent.appendChild(video);
+                }
+
+                // Adiciona a descrição
+                if (story.description) {
+                    storyDescription.innerHTML = story.description;
+                } else {
+                    storyDescription.innerHTML = '';
                 }
 
                 // Inicia o timer para avançar para a próxima story

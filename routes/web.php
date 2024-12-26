@@ -7,72 +7,55 @@ use App\Http\Controllers\CapsuleController;
 use App\Http\Controllers\StoryController;
 use Illuminate\Support\Facades\Route;
 
-
-
+// Rota Principal
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::middleware(['auth'])->get('/dashboard', function () {
-    $role = auth()->user()->role;
+// Grupo de Autenticação
+Route::middleware(['auth'])->group(function () {
+    // Dashboard com Redirecionamento por Role
+    Route::get('/dashboard', function () {
+        $role = auth()->user()->role;
 
-    if ($role === 'criador') {
-        // Se for criador, pode acessar a página de dashboard
-        return view('dashboard');  // Ou redirecionar para criador-home, caso queira uma página exclusiva para o criador
-    } elseif ($role === 'convidado') {
-        // Se for convidado, redireciona para a home de convidados
-        return redirect()->route('guest-home');
-    }
+        if ($role === 'criador') {
+            return view('dashboard');
+        } elseif ($role === 'convidado') {
+            return redirect()->route('guest-home');
+        }
 
-    // Se o usuário não tiver um papel definido, redireciona para a home geral ou uma página de erro
-    return view('dashboard');
-})->name('dashboard');
+        return view('dashboard');
+    })->name('dashboard');
 
-
-Route::middleware('auth')->group(function () {
+    // Perfil do Usuário
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Home Criador e Convidado
+    Route::get('/criador-home', [CriadorHomeController::class, 'index'])->name('criador-home');
+    Route::get('/guest-home', [GuestController::class, 'index'])->name('guest-home');
+
+    // Grupo de Rotas para Cápsulas
+    Route::prefix('capsules')->name('capsules.')->group(function () {
+        Route::get('/', [CapsuleController::class, 'index'])->name('index');
+        Route::get('/{capsule}', [CapsuleController::class, 'show'])->name('show');
+        Route::get('/{capsule}/edit', [CapsuleController::class, 'edit'])->name('edit');
+        Route::put('/{capsule}', [CapsuleController::class, 'update'])->name('update');
+        Route::delete('/{capsule}', [CapsuleController::class, 'destroy'])->name('destroy');
+        Route::post('/store', [CapsuleController::class, 'store'])->name('store');
+    });
+
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/capsules/create', [CapsuleController::class, 'create'])->name('capsules.create');
+    });
+
+    // Grupo de Rotas para Stories
+    Route::prefix('capsules/{capsule}/stories')->name('stories.')->group(function () {
+        Route::post('/', [StoryController::class, 'store'])->name('store');
+        Route::get('/player', [StoryController::class, 'player'])->name('player');
+    });
 });
 
-// Rota para a página de criador, acessível somente por criadores
-Route::middleware(['auth'])->get('/criador-home', [CriadorHomeController::class, 'index'])->name('criador-home');
-// Rota para a página de convidados, acessível somente por convidados
-Route::middleware(['auth'])->get('/guest-home', [GuestController::class, 'index'])->name('guest-home');
-
-Route::middleware(['auth'])->group(function () {
-    Route::post('/capsule/store', [CapsuleController::class, 'store'])->name('capsule.store');
-});
-
-Route::get('/capsules', [CapsuleController::class, 'index'])->name('capsules.index');
-
-Route::get('/capsules/{capsule}', [CapsuleController::class, 'show'])->name('capsules.show');
-
-// Grupo com middleware de autenticação, caso esteja usando
-Route::middleware(['auth'])->group(function () {
-    // ... outras rotas
-
-    // Rota para editar (exibe o formulário de edição)
-    Route::get('/capsules/{capsule}/edit', [CapsuleController::class, 'edit'])->name('capsules.edit');
-
-    // Rota para atualizar (envia o formulário de edição)
-    Route::put('/capsules/{capsule}', [CapsuleController::class, 'update'])->name('capsules.update');
-
-    // Rota para excluir
-    Route::delete('/capsules/{capsule}', [CapsuleController::class, 'destroy'])->name('capsules.destroy');
-});
-
-Route::middleware(['auth'])->group(function () {
-    // Rota para criar (inserir) uma story
-    Route::post('/capsules/{capsule}/stories', [StoryController::class, 'store'])->name('stories.store');
-});
-
-// Rota para o player do story
-Route::middleware(['auth'])->group(function () {
-    // Outras rotas...
-
-    // Rota para o Player de Stories
-    Route::get('/capsules/{capsule}/stories/player', [StoryController::class, 'player'])->name('stories.player');
-});
-
+// Autenticação
 require __DIR__ . '/auth.php';

@@ -15,9 +15,6 @@
     @if($capsules->isEmpty())
         <p class="fade-in text-gray-300" style="--delay: 0.6s">
             Você não tem nenhuma cápsula criada.
-            <a href="{{ route('capsules.create') }}" class="text-rose-500 hover:text-rose-700 underline">
-                Criar agora
-            </a>.
         </p>
     @else
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 fade-in" style="--delay: 0.6s">

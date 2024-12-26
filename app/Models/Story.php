@@ -16,6 +16,7 @@ class Story extends Model
         'media_type',
         'media_path',
         'duration',
+        'description',
     ];
 
     // Relacionamento com Capsule

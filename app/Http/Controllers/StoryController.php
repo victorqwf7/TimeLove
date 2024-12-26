@@ -8,31 +8,39 @@ use Illuminate\Http\Request;
 
 class StoryController extends Controller
 {
-    public function store(Request $request, Capsule $capsule)
+    public function store(Request $request, $capsule_id)
     {
         $request->validate([
-            'media_file' => 'required|file|mimetypes:image/*,video/*',
+            'media_file' => 'required|file|mimes:jpeg,png,gif,mp4,avi|max:20480',
             'duration' => 'nullable|integer|min:1|max:30',
+            'description' => 'nullable|string|max:255',
         ]);
 
-        // Descobrir se é foto ou vídeo de acordo com o mimetype
-        $mediaType = explode('/', $request->file('media_file')->getMimeType())[0]; // "image" ou "video"
+        $capsule = Capsule::findOrFail($capsule_id);
 
-        // Salvar o arquivo no storage
-        // Ajuste o path se quiser "capsules/{capsule->id}/stories", por ex.
-        $path = $request->file('media_file')->store('stories', 'public');
+        $file = $request->file('media_file');
+        $mediaPath = $file->store('stories', 'public');
+        $mediaType = $file->getMimeType();
 
-        // Criar a story
-        $story = Story::create([
+        if (str_starts_with($mediaType, 'image/')) {
+            $type = 'image';
+            $duration = 10; // Duração padrão para fotos
+        } elseif (str_starts_with($mediaType, 'video/')) {
+            $type = 'video';
+            $duration = $request->duration ?? 10; // Padrão de 10 segundos se não fornecido
+        } else {
+            return redirect()->back()->with('error', 'Tipo de arquivo não suportado.');
+        }
+
+        Story::create([
             'capsule_id' => $capsule->id,
-            'media_type' => $mediaType, // "image" ou "video"
-            'media_path' => $path,
-            'duration' => $request->duration ?? 5,
+            'media_type' => $type,
+            'media_path' => $mediaPath,
+            'duration' => $duration,
+            'description' => $request->description,
         ]);
 
-        return redirect()
-            ->route('capsules.show', $capsule)
-            ->with('success', 'Story criada com sucesso!');
+        return redirect()->back()->with('success', 'Story adicionado com sucesso!');
     }
 
     /**
