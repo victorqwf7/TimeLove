@@ -5,6 +5,7 @@ use App\Http\Controllers\CriadorHomeController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\CapsuleController;
 use App\Http\Controllers\StoryController;
+use App\Http\Middleware\EnsureUserIsCreator;
 use Illuminate\Support\Facades\Route;
 
 // Rota Principal
@@ -33,11 +34,11 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Home Criador e Convidado
-    Route::get('/criador-home', [CriadorHomeController::class, 'index'])->name('criador-home');
+    Route::get('/criador-home', [CriadorHomeController::class, 'index'])->middleware(['auth', EnsureUserIsCreator::class])->name('criador-home');
     Route::get('/guest-home', [GuestController::class, 'index'])->name('guest-home');
 
-    // Grupo de Rotas para Cápsulas
-    Route::prefix('capsules')->name('capsules.')->group(function () {
+    // Rotas protegidas para usuários com role 'criador'
+    Route::middleware(['auth', EnsureUserIsCreator::class])->prefix('capsules')->name('capsules.')->group(function () {
         Route::get('/', [CapsuleController::class, 'index'])->name('index');
         Route::get('/{capsule}', [CapsuleController::class, 'show'])->name('show');
         Route::get('/{capsule}/edit', [CapsuleController::class, 'edit'])->name('edit');
