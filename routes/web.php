@@ -54,6 +54,7 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('capsules/{capsule}/stories')->name('stories.')->group(function () {
         Route::post('/', [StoryController::class, 'store'])->name('store');
         Route::get('/player', [StoryController::class, 'player'])->name('player');
+        Route::delete('/{story}', [StoryController::class, 'destroy'])->name('destroy');
     });
 });
 

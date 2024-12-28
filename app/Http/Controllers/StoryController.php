@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Capsule;
 use App\Models\Story;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 
 class StoryController extends Controller
@@ -41,6 +42,26 @@ class StoryController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Story adicionado com sucesso!');
+    }
+
+    public function destroy($capsuleId, $storyId)
+    {
+        // Encontra o story pertencente à cápsula
+        $story = Story::where('id', $storyId)->where('capsule_id', $capsuleId)->first();
+
+        if (!$story) {
+            return redirect()->back()->with('error', 'Story não encontrado.');
+        }
+
+        // Exclui o arquivo da mídia (se necessário)
+        if (Storage::exists($story->media_path)) {
+            Storage::delete($story->media_path);
+        }
+
+        // Exclui o story
+        $story->delete();
+
+        return redirect()->back()->with('success', 'Story excluído com sucesso!');
     }
 
     /**

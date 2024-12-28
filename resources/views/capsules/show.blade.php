@@ -121,7 +121,7 @@
     @else
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 fade-in">
             @foreach($stories as $story)
-                <div class="bg-slate-800 p-4 rounded-lg shadow-md">
+                <div class="bg-slate-800 p-4 rounded-lg shadow-md relative">
                     @if($story->media_type === 'image')
                         <img src="{{ asset('storage/' . $story->media_path) }}" alt="Story"
                             class="w-full h-48 object-cover rounded-lg mb-4">
@@ -130,13 +130,25 @@
                             <source src="{{ asset('storage/' . $story->media_path) }}" type="video/mp4">
                         </video>
                     @endif
-                    <div class="text-gray-400 text-sm">
+
+                    <div class="text-gray-400 text-sm mb-4">
                         <p><strong>Duração:</strong> {{ $story->duration }}s</p>
                         <p><strong>Criado em:</strong> {{ $story->created_at->format('d/m/Y H:i') }}</p>
                         @if($story->description)
                             <p><strong>Descrição:</strong> {{ $story->description }}</p>
                         @endif
                     </div>
+
+                    <form method="POST"
+                        action="{{ route('stories.destroy', ['capsule' => $capsule->id, 'story' => $story->id]) }}"
+                        onsubmit="return confirm('Tem certeza que deseja excluir este story?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit"
+                            class="absolute bottom-4 right-2 px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition">
+                            Excluir
+                        </button>
+                    </form>
                 </div>
             @endforeach
         </div>

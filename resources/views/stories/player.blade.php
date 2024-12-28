@@ -87,6 +87,21 @@
         padding: 8px 12px;
     }
 
+    #story-navigation {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        z-index: 30;
+    }
+
+    #story-prev,
+    #story-next {
+        flex: 1;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+
     /* Responsividade */
     @media (max-width: 768px) {
         .progress-container {
@@ -107,6 +122,14 @@
 <div class="relative w-full h-screen overflow-hidden">
     <!-- Player de Stories -->
     <div id="story-player" class="relative w-full h-full">
+        <!-- Área de Navegação -->
+        <div id="story-navigation" class="absolute inset-0 flex z-30">
+            <!-- Área para voltar (esquerda) -->
+            <div id="story-prev" class="flex-1"></div>
+            <!-- Área para avançar (direita) -->
+            <div id="story-next" class="flex-1"></div>
+        </div>
+
         <!-- Barra de Progresso -->
         <div class="progress-container fixed top-4 left-4 right-4 flex gap-2 z-50">
             @foreach($stories as $index => $story)
@@ -118,15 +141,11 @@
         </div>
 
         <!-- Descrição do Story -->
-        <div id="story-description"
-            class="absolute top-14 left-0 right-0 text-center text-white">
-            <!-- A descrição será injetada aqui via JavaScript -->
+        <div id="story-description" class="absolute top-14 left-0 right-0 text-center text-white">
         </div>
 
         <!-- Conteúdo do Story -->
-        <div id="story-content" class="absolute inset-0 flex items-center justify-center z-10">
-            <!-- O conteúdo da story (imagem ou vídeo) será injetado aqui via JavaScript -->
-        </div>
+        <div id="story-content" class="absolute inset-0 flex items-center justify-center z-10"></div>
     </div>
 
 
@@ -137,13 +156,23 @@
             const stories = @json($stories);
             let currentIndex = 0;
             let timer;
+            let isPaused = false;
             const storyDescription = document.getElementById('story-description');
             const storyContent = document.getElementById('story-content');
             const progressBars = document.querySelectorAll('.progress-bar-inner');
+            const storyPrev = document.getElementById('story-prev');
+            const storyNext = document.getElementById('story-next');
+            const storyPlayer = document.getElementById('story-player');
 
-            function showStory(index) {
-                if (index < 0 || index >= stories.length) {
-                    // Se não houver mais stories, redireciona para a página da cápsula
+            function showStory(index, restart = false) {
+                if (index < 0) {
+                    // Se estiver no primeiro story e clicar para voltar, reinicia o tempo
+                    restartStory();
+                    return;
+                }
+
+                if (index >= stories.length) {
+                    // Se não houver mais stories, redireciona
                     window.location.href = "{{ route('capsules.show', $capsule->id) }}";
                     return;
                 }
@@ -152,22 +181,19 @@
                 const story = stories[currentIndex];
 
                 // Resetar todas as barras de progresso
-                progressBars.forEach((bar, i) => {
+                progressBars.forEach((bar) => {
                     bar.style.transition = 'none';
                     bar.style.width = '0%';
                 });
 
-                // Preencher a barra de progresso atual
+                // Ativar a barra atual
                 const currentBar = progressBars[currentIndex];
-                void currentBar.offsetWidth; // Força reflow
+                void currentBar.offsetWidth; // Forçar reflow
                 currentBar.style.transition = 'width ' + (story.duration || 5) + 's linear';
                 currentBar.style.width = '100%';
 
-                // Limpa o conteúdo anterior
-                storyDescription.innerHTML = ''; // Limpa a descrição anterior
+                // Exibir mídia
                 storyContent.innerHTML = '';
-
-                // Verifica o tipo de mídia e cria o elemento correspondente
                 if (story.media_type === 'image') {
                     const img = document.createElement('img');
                     img.src = "{{ asset('storage') }}/" + story.media_path;
@@ -182,25 +208,72 @@
                     storyContent.appendChild(video);
                 }
 
-                // Adiciona a descrição
-                if (story.description) {
-                    storyDescription.innerHTML = story.description;
-                } else {
-                    storyDescription.innerHTML = '';
-                }
+                // Exibir descrição
+                storyDescription.innerHTML = story.description || '';
 
-                // Inicia o timer para avançar para a próxima story
+                // Iniciar timer
                 clearTimeout(timer);
-                timer = setTimeout(() => {
-                    showStory(currentIndex + 1);
-                }, (story.duration || 5) * 1000); // Duração em segundos
+                if (!restart) {
+                    timer = setTimeout(() => {
+                        if (!isPaused) showStory(currentIndex + 1);
+                    }, (story.duration || 5) * 1000); // Duração em segundos
+                }
             }
 
-            // Inicia a exibição da primeira story
+            function restartStory() {
+                // Reinicia a barra de progresso e o timer do story atual
+                const currentBar = progressBars[currentIndex];
+                currentBar.style.transition = 'none';
+                currentBar.style.width = '0%';
+                void currentBar.offsetWidth; // Forçar reflow
+                currentBar.style.transition = 'width ' + (stories[currentIndex].duration || 5) + 's linear';
+                currentBar.style.width = '100%';
+
+                clearTimeout(timer);
+                timer = setTimeout(() => {
+                    if (!isPaused) showStory(currentIndex + 1);
+                }, (stories[currentIndex].duration || 5) * 1000);
+            }
+
+            // Navegação para próximo story
+            storyNext.addEventListener('click', () => {
+                showStory(currentIndex + 1);
+            });
+
+            // Navegação para story anterior
+            storyPrev.addEventListener('click', () => {
+                if (currentIndex === 0) {
+                    restartStory(); // Reinicia o tempo se estiver no primeiro story
+                } else {
+                    showStory(currentIndex - 1);
+                }
+            });
+
+            // Pausar ao segurar clique
+            storyPlayer.addEventListener('mousedown', () => {
+                isPaused = true;
+                clearTimeout(timer);
+                const currentBar = progressBars[currentIndex];
+                currentBar.style.transition = 'none';
+            });
+
+            // Retomar ao soltar clique
+            storyPlayer.addEventListener('mouseup', () => {
+                isPaused = false;
+                const currentBar = progressBars[currentIndex];
+                currentBar.style.transition = 'width ' + (stories[currentIndex].duration || 5) + 's linear';
+                const currentProgress = currentBar.offsetWidth / currentBar.parentElement.offsetWidth;
+                const remainingTime = (1 - currentProgress) * (stories[currentIndex].duration || 5) * 1000;
+
+                timer = setTimeout(() => {
+                    showStory(currentIndex + 1);
+                }, remainingTime);
+            });
+
+            // Iniciar player
             if (stories.length > 0) {
                 showStory(currentIndex);
             } else {
-                // Se não houver stories, redireciona para a página da cápsula
                 window.location.href = "{{ route('capsules.show', $capsule->id) }}";
             }
         });
