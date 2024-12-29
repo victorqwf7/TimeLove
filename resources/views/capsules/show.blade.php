@@ -68,7 +68,20 @@
                 </button>
             </form>
         </div>
+        <h2 class="text-xl font-bold mt-6 mb-4">🔗 Compartilhar Cápsula</h2>
+
+        <form method="POST" action="{{ route('capsules.share', $capsule->id) }}" class="bg-gray-800 p-4 rounded-lg">
+            @csrf
+            <label for="email" class="block text-white mb-2">E-mail do Convidado</label>
+            <input type="email" id="email" name="email" required class="w-full p-2 rounded-lg mb-2"
+                placeholder="Digite o e-mail do convidado">
+            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                Compartilhar
+            </button>
+        </form>
     </div>
+
+
 
     <!-- FORMULÁRIO DE ADICIONAR NOVO STORY -->
     <form method="POST" action="{{ route('stories.store', $capsule->id) }}" enctype="multipart/form-data"

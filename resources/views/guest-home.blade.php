@@ -15,74 +15,57 @@
 @endsection
 
 @section('content')
-<div class="h-screen flex flex-col">
-    <!-- Main Content -->
-    <main class="">
-        <section class="flex justify-center min-h-screen mt-32 text-white">
-            <div class="fade-in">
-                <div class="justify-items-center">
-                    <p class="text-2xl">Bem-vinda, {{ auth()->user()->name }}!</p>
-                </div>
-                <div class="m-8 justify-items-center">
-                    <p class="text">Esta é a tela de convidados.</p>
-                    <p class="text">Vamos ver o que seu amor preparou para você no
-                        TimeLove?
-                    </p>
-                </div>
+
+<!-- Boas-Vindas -->
+<section class="text-center py-8 text-white bg-gray-900 my-8">
+    <h1 class="text-3xl font-bold mb-2">🎉 Bem-vindo(a), {{ auth()->user()->name }}!</h1>
+    <p class="text-gray-300">Explore as cápsulas do tempo compartilhadas com você.</p>
+</section>
+
+<!-- Cápsulas Compartilhadas -->
+<section class="py-8 bg-gray-800 mx-8">
+    <h2 class="text-2xl font-bold text-white text-center mb-4">📦 Cápsulas Compartilhadas</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-4">
+        @forelse($sharedCapsules as $capsule)
+            <div class="bg-gray-700 p-4 rounded-lg shadow-md">
+                <h3 class="text-lg font-semibold text-white">{{ $capsule->name }}</h3>
+                <p class="text-gray-400">Tema: {{ $capsule->theme }}</p>
+                <p class="text-gray-400">Criador: {{ $capsule->user->name }}</p>
+                <a href="{{ route('capsules.show', $capsule->id) }}" class="text-blue-400 hover:text-blue-500">🔗 Ver
+                    Detalhes</a>
             </div>
-        </section>
-        <section class="flex flex-col mb-20 text-black bg-slate-200 rounded-lg">
-            <!-- Wrapper para aplicar fade-in em tudo -->
-            <div class="scroll-fade-in" style="--delay: 0.2s">
-                <!-- Primeira Linha -->
-                <div class="flex justify-start items-center gap-2 p-4 bg-slate-200">
-                    <h1 class="text-4xl scroll-fade-in" style="--delay: 0.3s">O que</h1>
-                    <h1 class="text-4xl scroll-fade-in" style="--delay: 0.4s">está</h1>
-                    <h1 class="text-4xl scroll-fade-in" style="--delay: 0.5s">te</h1>
-                    <h1 class="text-4xl scroll-fade-in" style="--delay: 0.9s">esperando?</h1>
-                </div>
+        @empty
+            <p class="text-gray-300 text-center col-span-3">Nenhuma cápsula compartilhada ainda.</p>
+        @endforelse
+    </div>
+</section>
 
-                <!-- Botões com animação -->
-                <div class="flex justify-around my-10">
-                    <!-- Primeiro Botão -->
-                    <button
-                        class="p-8 bg-slate-900 rounded-lg m-2 text-white hover:text-rose-500 transition duration-300 scroll-fade-in"
-                        style="--delay: 1.2s">
-                        Cápsula do Tempo
-                    </button>
-
-                    <!-- Segundo Botão -->
-                    <button
-                        class="p-8 bg-slate-900 rounded-lg m-2 text-white hover:text-rose-500 transition duration-300 scroll-fade-in"
-                        style="--delay: 1.5s">
-                        Linha do Tempo
-                    </button>
-                </div>
+<!-- Stories Recentes -->
+<section class="py-8 bg-gray-900 m-8">
+    <h2 class="text-2xl font-bold text-white text-center mb-4">📸 Stories Recentes</h2>
+    <div class="flex gap-4 overflow-x-auto px-4">
+        @forelse($recentStories as $story)
+            <div class="w-32 h-32 bg-gray-700 rounded-lg flex items-center justify-center text-white">
+                @if($story->media_type === 'image')
+                    <img src="{{ asset('storage/' . $story->media_path) }}" class="w-full h-full object-cover rounded-lg">
+                @elseif($story->media_type === 'video')
+                    <video src="{{ asset('storage/' . $story->media_path) }}" class="w-full h-full object-cover rounded-lg"
+                        autoplay muted></video>
+                @endif
             </div>
-        </section>
-    </main>
-</div>
+        @empty
+            <p class="text-gray-300">Nenhum story recente.</p>
+        @endforelse
+    </div>
+</section>
 
+<!-- Configurações (Opcional) -->
+<section class="py-8 bg-gray-900 m-8">
+    <h2 class="text-2xl font-bold text-white text-center mb-4">⚙️ Configurações</h2>
+    <p class="text-center text-gray-300">Gerencie suas preferências de notificações e perfil.</p>
+    <div class="text-center mt-4">
+        <a href="#" class="text-blue-400 hover:text-blue-500">🔧 Editar Perfil</a>
+    </div>
+</section>
 
-<script>
-    // script fade ao rolar a página
-    document.addEventListener('DOMContentLoaded', function () {
-        const items = document.querySelectorAll('.scroll-fade-in');
-
-        const handleScroll = () => {
-            items.forEach((item) => {
-                const rect = item.getBoundingClientRect();
-                if (rect.top < window.innerHeight && rect.bottom > 0) {
-                    item.classList.add('show');
-                }
-            });
-        };
-
-        // Detecta o scroll na página
-        window.addEventListener('scroll', handleScroll);
-
-        // Verifica os itens já visíveis na carga inicial
-        handleScroll();
-    });
-</script>
 @endsection

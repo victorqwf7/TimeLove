@@ -5,21 +5,30 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use App\Models\Capsule;
 
 class EnsureUserIsCreator
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
     public function handle(Request $request, Closure $next): Response
     {
+        $user = auth()->user();
+        $capsule = $request->route('capsule'); // Obtém a cápsula da rota
 
-        if (auth()->check() && auth()->user()->role !== 'criador') {
-            abort(403, 'Acesso negado. Apenas usuários com a permissão criador podem acessar esta página.');
+        if (!$capsule) {
+            abort(404, 'Cápsula não encontrada.');
         }
 
-        return $next($request);
+        // ✅ Verifica se o usuário é criador da cápsula
+        if ($user->role === 'criador' && $capsule->user_id === $user->id) {
+            return $next($request);
+        }
+
+        // ✅ Verifica se o usuário convidado tem acesso compartilhado
+        if ($user->role === 'convidado' && $capsule->sharedWith()->where('user_id', $user->id)->exists()) {
+            return $next($request);
+        }
+
+        // ❌ Se não passar nenhuma das verificações, bloqueia o acesso
+        abort(403, 'Acesso negado. Você não tem permissão para acessar esta cápsula.');
     }
 }

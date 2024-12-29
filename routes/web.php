@@ -5,8 +5,9 @@ use App\Http\Controllers\CriadorHomeController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\CapsuleController;
 use App\Http\Controllers\StoryController;
-use App\Http\Middleware\EnsureUserIsCreator;
 use App\Http\Controllers\Auth\ChooseRoleController;
+use App\Http\Middleware\EnsureUserIsCreator;
+use App\Http\Middleware\EnsureUserIsGuest;
 use Illuminate\Support\Facades\Route;
 
 // **Rota Principal**
@@ -46,8 +47,8 @@ Route::middleware(['auth'])->group(function () {
     // Home do Criador (Somente Criadores)
     Route::middleware([EnsureUserIsCreator::class])->get('/criador-home', [CriadorHomeController::class, 'index'])->name('criador-home');
 
-    // Home do Convidado
-    Route::get('/guest-home', [GuestController::class, 'index'])->name('guest-home');
+    // Home do Convidado (Somente Convidados)
+    Route::middleware([EnsureUserIsGuest::class])->get('/guest-home', [GuestController::class, 'index'])->name('guest-home');
 });
 
 // **Rotas para Cápsulas (Somente Criadores)**
@@ -67,6 +68,9 @@ Route::middleware(['auth', EnsureUserIsCreator::class])->prefix('capsules/{capsu
     Route::get('/player', [StoryController::class, 'player'])->name('player');
     Route::delete('/{story}', [StoryController::class, 'destroy'])->name('destroy');
 });
+
+// **Rota para Compartilhar Cápsula (Somente Criadores)**
+Route::middleware(['auth', EnsureUserIsCreator::class])->post('/capsules/{capsule}/share', [CapsuleController::class, 'share'])->name('capsules.share');
 
 // **Rotas de Autenticação (Fornecidas pelo Breeze)**
 require __DIR__ . '/auth.php';
