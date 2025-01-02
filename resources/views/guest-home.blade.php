@@ -17,14 +17,14 @@
 @section('content')
 <div class="min-h-screen flex flex-col bg-gray-900 text-white">
     <!-- Boas-Vindas -->
-    <section class="text-center py-8">
+    <section class="text-center py-8 fade-in">
         <h1 class="text-3xl font-bold mb-2">🎉 Bem-vindo(a), {{ auth()->user()->name }}!</h1>
         <p class="text-gray-300">Aqui estão as cápsulas do tempo compartilhadas com você.</p>
     </section>
 
     <!-- Cápsulas Compartilhadas -->
-    <h2 class="text-xl font-bold mb-4">📦 Cápsulas Compartilhadas</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <h2 class="text-xl font-bold mb-4 fade-in">📦 Cápsulas Compartilhadas</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 fade-in">
         @forelse ($sharedCapsules as $capsule)
             <div class="bg-gray-700 p-4 rounded-lg shadow-md">
                 <h3 class="text-lg font-semibold text-white">{{ $capsule->name }}</h3>
@@ -35,18 +35,18 @@
                 </a>
             </div>
         @empty
-            <p class="text-gray-300">Nenhuma cápsula compartilhada disponível.</p>
+            <p class="text-gray-300 fade-in">Nenhuma cápsula compartilhada disponível.</p>
         @endforelse
     </div>
 
     <!-- Stories Recentes -->
     <section class="py-8 px-4">
-        <h2 class="text-2xl font-bold mb-4 text-center">📸 Stories Recentes</h2>
+        <h2 class="text-2xl font-bold mb-4 text-center fade-out">📸 Stories Recentes</h2>
 
         @if($recentStories->isEmpty())
-            <p class="text-center text-gray-400">Nenhuma história recente disponível.</p>
+            <p class="text-center text-gray-400 fade-out">Nenhuma história recente disponível.</p>
         @else
-            <div class="flex gap-4 overflow-x-auto px-4">
+            <div class="flex gap-4 overflow-x-auto px-4 fade-in">
                 @foreach($recentStories as $story)
                     <div class="w-32 h-32 bg-gray-800 rounded-lg flex items-center justify-center text-white">
                         @if($story->media_type === 'image')
@@ -67,10 +67,6 @@
     <section class="py-8 px-4 text-center">
         <h2 class="text-2xl font-bold mb-4">⚙️ O que mais você pode fazer?</h2>
         <div class="flex justify-center gap-4">
-            <a href="#"
-                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition">
-                📅 Ver Linha do Tempo
-            </a>
             <a href="{{ route('profile.edit') }}"
                 class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition">
                 🛠️ Editar Perfil

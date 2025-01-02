@@ -188,12 +188,18 @@
         </div>
     @endif
 
-    <!-- Link para voltar à listagem ou outra página -->
-    <div class="mt-6 fade-in" style="--delay: 0.8s">
-        <a href="{{ route('capsules.index') }}" class="underline text-rose-500 hover:text-rose-700 transition">
+
+    @if (auth()->user()->id === $capsule->user_id)
+        <!-- Link para Criadores -->
+        <a href="{{ route('capsules.index') }}" class="underline text-rose-500 hover:text-rose-700 transition my-8">
             Voltar à Listagem
         </a>
-    </div>
+    @else
+        <!-- Link para Convidados -->
+        <a href="{{ route('guest-home') }}" class="underline text-rose-500 hover:text-rose-700 transition my-8">
+                Voltar para o início
+            </a>
+    @endif
 </div>
 
 <!-- Script para Manipular o Formulário -->
