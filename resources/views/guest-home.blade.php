@@ -73,6 +73,10 @@
             </a>
         </div>
     </section>
+
+    <a href="{{ route('landing') }}" class="underline text-rose-500 hover:text-rose-700 transition m-8 fade-in">
+        Ir para página principal
+    </a>
 </div>
 
 <script>
