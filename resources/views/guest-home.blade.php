@@ -2,11 +2,11 @@
 
 @section('header')
 <div class="flex justify-between m-8">
-    <div class="fade-out text-white">
+    <div class="fade-out text-white text-2xl font-bold">
         TimeLove
     </div>
     <div class="fade-out text-black">
-        <form method="POST" action="{{route('logout')}}">
+        <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button class="rounded-full bg-white py-4 px-8 mx-4" type="submit">Sair</button>
         </form>
@@ -15,57 +15,72 @@
 @endsection
 
 @section('content')
-<div class="h-screen flex flex-col">
-    <!-- Main Content -->
-    <main class="">
-        <section class="flex justify-center min-h-screen mt-32 text-white">
-            <div class="fade-in">
-                <div class="justify-items-center">
-                    <p class="text-2xl">Bem-vinda, {{ auth()->user()->name }}!</p>
-                </div>
-                <div class="m-8 justify-items-center">
-                    <p class="text">Esta é a tela de convidados.</p>
-                    <p class="text">Vamos ver o que seu amor preparou para você no
-                        TimeLove?
-                    </p>
-                </div>
-            </div>
-        </section>
-        <section class="flex flex-col mb-20 text-black bg-slate-200 rounded-lg">
-            <!-- Wrapper para aplicar fade-in em tudo -->
-            <div class="scroll-fade-in" style="--delay: 0.2s">
-                <!-- Primeira Linha -->
-                <div class="flex justify-start items-center gap-2 p-4 bg-slate-200">
-                    <h1 class="text-4xl scroll-fade-in" style="--delay: 0.3s">O que</h1>
-                    <h1 class="text-4xl scroll-fade-in" style="--delay: 0.4s">está</h1>
-                    <h1 class="text-4xl scroll-fade-in" style="--delay: 0.5s">te</h1>
-                    <h1 class="text-4xl scroll-fade-in" style="--delay: 0.9s">esperando?</h1>
-                </div>
+<div class="min-h-screen flex flex-col bg-gray-900 text-white">
+    <!-- Boas-Vindas -->
+    <section class="text-center py-8">
+        <h1 class="text-3xl font-bold mb-2">🎉 Bem-vindo(a), {{ auth()->user()->name }}!</h1>
+        <p class="text-gray-300">Aqui estão as cápsulas do tempo compartilhadas com você.</p>
+    </section>
 
-                <!-- Botões com animação -->
-                <div class="flex justify-around my-10">
-                    <!-- Primeiro Botão -->
-                    <button
-                        class="p-8 bg-slate-900 rounded-lg m-2 text-white hover:text-rose-500 transition duration-300 scroll-fade-in"
-                        style="--delay: 1.2s">
-                        Cápsula do Tempo
-                    </button>
-
-                    <!-- Segundo Botão -->
-                    <button
-                        class="p-8 bg-slate-900 rounded-lg m-2 text-white hover:text-rose-500 transition duration-300 scroll-fade-in"
-                        style="--delay: 1.5s">
-                        Linha do Tempo
-                    </button>
-                </div>
+    <!-- Cápsulas Compartilhadas -->
+    <h2 class="text-xl font-bold mb-4">📦 Cápsulas Compartilhadas</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        @forelse ($sharedCapsules as $capsule)
+            <div class="bg-gray-700 p-4 rounded-lg shadow-md">
+                <h3 class="text-lg font-semibold text-white">{{ $capsule->name }}</h3>
+                <p class="text-gray-400">Tema: {{ $capsule->theme }}</p>
+                <p class="text-gray-400">Criador: {{ $capsule->user->name }}</p>
+                <a href="{{ route('capsules.show', $capsule->id) }}" class="text-blue-400 hover:text-blue-500">
+                    🔗 Ver Detalhes
+                </a>
             </div>
-        </section>
-    </main>
+        @empty
+            <p class="text-gray-300">Nenhuma cápsula compartilhada disponível.</p>
+        @endforelse
+    </div>
+
+    <!-- Stories Recentes -->
+    <section class="py-8 px-4">
+        <h2 class="text-2xl font-bold mb-4 text-center">📸 Stories Recentes</h2>
+
+        @if($recentStories->isEmpty())
+            <p class="text-center text-gray-400">Nenhuma história recente disponível.</p>
+        @else
+            <div class="flex gap-4 overflow-x-auto px-4">
+                @foreach($recentStories as $story)
+                    <div class="w-32 h-32 bg-gray-800 rounded-lg flex items-center justify-center text-white">
+                        @if($story->media_type === 'image')
+                            <img src="{{ asset('storage/' . $story->media_path) }}" alt="Story"
+                                class="w-full h-full object-cover rounded-lg">
+                        @elseif($story->media_type === 'video')
+                            <video controls class="w-full h-full object-cover rounded-lg">
+                                <source src="{{ asset('storage/' . $story->media_path) }}" type="video/mp4">
+                            </video>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+        @endif
+    </section>
+
+    <!-- Ações Adicionais -->
+    <section class="py-8 px-4 text-center">
+        <h2 class="text-2xl font-bold mb-4">⚙️ O que mais você pode fazer?</h2>
+        <div class="flex justify-center gap-4">
+            <a href="#"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition">
+                📅 Ver Linha do Tempo
+            </a>
+            <a href="{{ route('profile.edit') }}"
+                class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition">
+                🛠️ Editar Perfil
+            </a>
+        </div>
+    </section>
 </div>
 
-
 <script>
-    // script fade ao rolar a página
+    // Script de Fade-in ao rolar a página
     document.addEventListener('DOMContentLoaded', function () {
         const items = document.querySelectorAll('.scroll-fade-in');
 
@@ -78,10 +93,7 @@
             });
         };
 
-        // Detecta o scroll na página
         window.addEventListener('scroll', handleScroll);
-
-        // Verifica os itens já visíveis na carga inicial
         handleScroll();
     });
 </script>

@@ -72,18 +72,29 @@ class StoryController extends Controller
      */
     public function player(Capsule $capsule)
     {
-        // Verifica se a cápsula pertence ao usuário logado
-        if ($capsule->user_id !== auth()->id()) {
-            abort(403, 'Acesso negado');
+        $user = auth()->user();
+
+        // Permitir acesso se o usuário for o criador da cápsula
+        if ($user->id === $capsule->user_id) {
+            $stories = $capsule->stories()->orderBy('created_at', 'asc')->get();
+
+            return view('stories.player', [
+                'capsule' => $capsule,
+                'stories' => $stories,
+            ]);
         }
 
-        // Carrega todas as stories associadas à cápsula, ordenadas pela data de criação
-        $stories = $capsule->stories()->orderBy('created_at', 'asc')->get();
+        // Permitir acesso se o usuário for um convidado com acesso compartilhado
+        if ($capsule->sharedWith()->where('user_id', $user->id)->exists()) {
+            $stories = $capsule->stories()->orderBy('created_at', 'asc')->get();
 
-        // Retorna a view do player de stories, passando a cápsula e as stories
-        return view('stories.player', [
-            'capsule' => $capsule,
-            'stories' => $stories,
-        ]);
+            return view('stories.player', [
+                'capsule' => $capsule,
+                'stories' => $stories,
+            ]);
+        }
+
+        // Bloquear acesso para qualquer outro usuário
+        abort(403, 'Acesso negado. Você não tem permissão para acessar os stories desta cápsula.');
     }
 }

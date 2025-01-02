@@ -1,5 +1,19 @@
 @extends('layouts.criador-layout')
 
+@section('header')
+<div class="flex justify-between m-8">
+    <div class="fade-out text-white">
+        TimeLove
+    </div>
+    <div class="fade-out text-black">
+        <form method="POST" action="{{route('logout')}}">
+            @csrf
+            <button class="rounded-full bg-white py-4 px-8 mx-4" type="submit">Sair</button>
+        </form>
+    </div>
+</div>
+@endsection
+
 @section('content')
 <div class="container mx-auto py-6 px-4 text-white">
     <h1 class="text-3xl font-bold mb-6 fade-in" style="--delay: 0.2s">

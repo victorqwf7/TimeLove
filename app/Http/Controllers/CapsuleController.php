@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Capsule;
+use App\Models\User;
 
 class CapsuleController extends Controller
 {
@@ -20,18 +21,30 @@ class CapsuleController extends Controller
 
     public function show(Capsule $capsule)
     {
-        // Verifica se a cápsula pertence ao usuário
-        if ($capsule->user_id !== auth()->id()) {
-            abort(403, 'Acesso negado');
-        }
-        // Carrega as stories associadas à cápsula
-        // (pode ordenar por created_at, se quiser)
-        $stories = $capsule->stories()->orderBy('created_at', 'desc')->get();
+        $user = auth()->user();
 
-        return view('capsules.show', [
-            'capsule' => $capsule,
-            'stories' => $stories,
-        ]);
+        // Permitir acesso se for o criador da cápsula
+        if ($user->id === $capsule->user_id) {
+            $stories = $capsule->stories()->orderBy('created_at', 'desc')->get();
+
+            return view('capsules.show', [
+                'capsule' => $capsule,
+                'stories' => $stories,
+            ]);
+        }
+
+        // Permitir acesso se for um convidado com acesso compartilhado
+        if ($capsule->sharedWith()->where('user_id', $user->id)->exists()) {
+            $stories = $capsule->stories()->orderBy('created_at', 'desc')->get();
+
+            return view('capsules.show', [
+                'capsule' => $capsule,
+                'stories' => $stories,
+            ]);
+        }
+
+        // Bloquear acesso para qualquer outro usuário
+        abort(403, 'Acesso negado. Você não tem permissão para acessar esta cápsula.');
     }
 
     public function store(Request $request)
@@ -89,5 +102,32 @@ class CapsuleController extends Controller
         $capsule->delete();
 
         return redirect()->route('capsules.index')->with('success', 'Cápsula excluída com sucesso!');
+    }
+
+
+    public function share(Request $request, Capsule $capsule)
+    {
+        // Verifica se o usuário autenticado é o dono da cápsula
+        if ($capsule->user_id !== auth()->id()) {
+            abort(403, 'Acesso negado. Você não pode compartilhar esta cápsula.');
+        }
+
+        // Validação do e-mail do convidado
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        // Busca o usuário pelo e-mail
+        $user = User::where('email', $request->email)->first();
+
+        // Verifica se o usuário já tem acesso à cápsula
+        if ($capsule->sharedWith()->where('user_id', $user->id)->exists()) {
+            return back()->with('error', 'Este usuário já tem acesso à cápsula.');
+        }
+
+        // Compartilha a cápsula com o usuário
+        $capsule->sharedWith()->attach($user->id);
+
+        return back()->with('success', 'Cápsula compartilhada com sucesso!');
     }
 }

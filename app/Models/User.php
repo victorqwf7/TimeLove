@@ -61,4 +61,10 @@ class User extends Authenticatable
     {
         return $this->role === 'convidado';
     }
+
+    public function sharedCapsules()
+    {
+        return $this->belongsToMany(Capsule::class, 'capsule_user', 'user_id', 'capsule_id')
+            ->withTimestamps();
+    }
 }

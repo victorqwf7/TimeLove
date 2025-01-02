@@ -55,17 +55,24 @@ Route::middleware(['auth', EnsureUserIsCreator::class])->prefix('capsules')->nam
     Route::get('/', [CapsuleController::class, 'index'])->name('index');
     Route::get('/create', [CapsuleController::class, 'create'])->name('create');
     Route::post('/store', [CapsuleController::class, 'store'])->name('store');
-    Route::get('/{capsule}', [CapsuleController::class, 'show'])->name('show');
     Route::get('/{capsule}/edit', [CapsuleController::class, 'edit'])->name('edit');
     Route::put('/{capsule}', [CapsuleController::class, 'update'])->name('update');
     Route::delete('/{capsule}', [CapsuleController::class, 'destroy'])->name('destroy');
 });
+// Rota para convidados visualizarem cápsulas compartilhadas
+Route::middleware(['auth'])->get('/capsules/{capsule}', [CapsuleController::class, 'show'])->name('capsules.show');
+// Compartilhar cápsula (Apenas Criadores)
+Route::middleware(['auth', EnsureUserIsCreator::class])->group(function () {
+    Route::post('/capsules/{capsule}/share', [CapsuleController::class, 'share'])->name('capsules.share');
+});
 
 // **Rotas para Stories (Relacionadas a Cápsulas)**
-Route::middleware(['auth', EnsureUserIsCreator::class])->prefix('capsules/{capsule}/stories')->name('stories.')->group(function () {
-    Route::post('/', [StoryController::class, 'store'])->name('store');
+Route::middleware(['auth'])->prefix('capsules/{capsule}/stories')->name('stories.')->group(function () {
+    Route::post('/', [StoryController::class, 'store'])->middleware(EnsureUserIsCreator::class)->name('store');
+    Route::delete('/{story}', [StoryController::class, 'destroy'])->middleware(EnsureUserIsCreator::class)->name('destroy');
+
+    // Permite acesso a criadores e convidados com acesso à cápsula
     Route::get('/player', [StoryController::class, 'player'])->name('player');
-    Route::delete('/{story}', [StoryController::class, 'destroy'])->name('destroy');
 });
 
 // **Rotas de Autenticação (Fornecidas pelo Breeze)**
