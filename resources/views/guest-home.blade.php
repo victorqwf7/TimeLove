@@ -23,7 +23,7 @@
     </section>
 
     <!-- Cápsulas Compartilhadas -->
-    <h2 class="text-xl font-bold mb-4 fade-in">📦 Cápsulas Compartilhadas</h2>
+    <h2 class="text-xl font-bold mb-4 text-center fade-in">📦 Cápsulas Compartilhadas</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 fade-in">
         @forelse ($sharedCapsules as $capsule)
             <div class="bg-gray-700 p-4 rounded-lg shadow-md">
@@ -65,8 +65,8 @@
 
     <!-- Ações Adicionais -->
     <section class="py-8 px-4 text-center">
-        <h2 class="text-2xl font-bold mb-4">⚙️ O que mais você pode fazer?</h2>
-        <div class="flex justify-center gap-4">
+        <h2 class="text-2xl font-bold mb-4 fade-out">⚙️ O que mais você pode fazer?</h2>
+        <div class="flex justify-center gap-4 fade-in">
             <a href="{{ route('profile.edit') }}"
                 class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition">
                 🛠️ Editar Perfil

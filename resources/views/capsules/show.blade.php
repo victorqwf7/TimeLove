@@ -191,12 +191,12 @@
 
     @if (auth()->user()->id === $capsule->user_id)
         <!-- Link para Criadores -->
-        <a href="{{ route('capsules.index') }}" class="underline text-rose-500 hover:text-rose-700 transition my-8">
+        <a href="{{ route('capsules.index') }}" class="underline text-rose-500 hover:text-rose-700 transition m-8">
             Voltar à Listagem
         </a>
     @else
         <!-- Link para Convidados -->
-        <a href="{{ route('guest-home') }}" class="underline text-rose-500 hover:text-rose-700 transition my-8">
+        <a href="{{ route('guest-home') }}" class="underline text-rose-500 hover:text-rose-700 transition m-8">
                 Voltar para o início
             </a>
     @endif
