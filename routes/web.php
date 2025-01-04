@@ -71,14 +71,15 @@ Route::middleware(['auth'])->prefix('capsules')->name('capsules.')->group(functi
 });
 
 // **Rotas para Stories (Relacionadas a Cápsulas)**
+// Grupo de Rotas para Stories (Permissão para Criadores e Convidados)
 Route::middleware(['auth'])->prefix('capsules/{capsule}/stories')->name('stories.')->group(function () {
-    Route::middleware(EnsureUserIsCreator::class)->group(function () {
-        Route::post('/', [StoryController::class, 'store'])->name('store');
-        Route::delete('/{story}', [StoryController::class, 'destroy'])->name('destroy');
-    });
+    Route::post('/', [StoryController::class, 'store'])->name('store'); // Adicionar Story
+    Route::get('/player', [StoryController::class, 'player'])->name('player'); // Ver Stories
 
-    // Acesso ao player permitido para criadores e convidados compartilhados
-    Route::get('/player', [StoryController::class, 'player'])->name('player');
+    // Exclusão restrita apenas ao criador
+    Route::delete('/{story}', [StoryController::class, 'destroy'])
+        ->middleware(EnsureUserIsCreator::class)
+        ->name('destroy');
 });
 
 // **Rotas de Autenticação (Fornecidas pelo Breeze)**

@@ -20,6 +20,15 @@ class StoryController extends Controller
 
         // Encontrar a cápsula
         $capsule = Capsule::findOrFail($capsule_id);
+        $user = auth()->user();
+
+        // Verificar permissão (criador ou convidado com acesso)
+        $isOwner = $user->id === $capsule->user_id;
+        $isShared = $capsule->sharedWith()->where('user_id', $user->id)->exists();
+
+        if (!$isOwner && !$isShared) {
+            abort(403, 'Você não tem permissão para adicionar stories nesta cápsula.');
+        }
 
         // Obter o arquivo
         $file = $request->file('media_file');
@@ -34,7 +43,6 @@ class StoryController extends Controller
             $type = 'video';
             $duration = $request->duration ?? 10; // Padrão de 10 segundos se não fornecido
         } else {
-            // Caso um tipo de arquivo não suportado passe pela validação (improvável)
             return redirect()->back()->with('error', 'Tipo de arquivo não suportado.');
         }
 
@@ -52,19 +60,24 @@ class StoryController extends Controller
 
     public function destroy($capsuleId, $storyId)
     {
-        // Encontra o story pertencente à cápsula
         $story = Story::where('id', $storyId)->where('capsule_id', $capsuleId)->first();
 
         if (!$story) {
             return redirect()->back()->with('error', 'Story não encontrado.');
         }
 
-        // Exclui o arquivo da mídia (se necessário)
+        $user = auth()->user();
+        $capsule = Capsule::findOrFail($capsuleId);
+
+        // Apenas o criador pode excluir stories
+        if ($user->id !== $capsule->user_id) {
+            abort(403, 'Você não tem permissão para excluir este story.');
+        }
+
         if (Storage::exists($story->media_path)) {
             Storage::delete($story->media_path);
         }
 
-        // Exclui o story
         $story->delete();
 
         return redirect()->back()->with('success', 'Story excluído com sucesso!');
@@ -80,27 +93,19 @@ class StoryController extends Controller
     {
         $user = auth()->user();
 
-        // Permitir acesso se o usuário for o criador da cápsula
-        if ($user->id === $capsule->user_id) {
-            $stories = $capsule->stories()->orderBy('created_at', 'asc')->get();
+        // Permitir acesso se for dono ou convidado com acesso
+        $isOwner = $user->id === $capsule->user_id;
+        $isShared = $capsule->sharedWith()->where('user_id', $user->id)->exists();
 
-            return view('stories.player', [
-                'capsule' => $capsule,
-                'stories' => $stories,
-            ]);
+        if (!$isOwner && !$isShared) {
+            abort(403, 'Acesso negado. Você não tem permissão para acessar os stories desta cápsula.');
         }
 
-        // Permitir acesso se o usuário for um convidado com acesso compartilhado
-        if ($capsule->sharedWith()->where('user_id', $user->id)->exists()) {
-            $stories = $capsule->stories()->orderBy('created_at', 'asc')->get();
+        $stories = $capsule->stories()->orderBy('created_at', 'asc')->get();
 
-            return view('stories.player', [
-                'capsule' => $capsule,
-                'stories' => $stories,
-            ]);
-        }
-
-        // Bloquear acesso para qualquer outro usuário
-        abort(403, 'Acesso negado. Você não tem permissão para acessar os stories desta cápsula.');
+        return view('stories.player', [
+            'capsule' => $capsule,
+            'stories' => $stories,
+        ]);
     }
 }
