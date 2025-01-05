@@ -1,5 +1,3 @@
-  TimeLove - Documentação
-
 🎉 **TimeLove ❤️**
 ==================
 
