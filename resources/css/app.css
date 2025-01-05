@@ -3,6 +3,15 @@
 @tailwind utilities;
 
 
+/* Garante que nenhum estilo padrão sobrescreva o fundo */
+body {
+    @apply bg-gray-900 text-white;
+}
+
+.form-container {
+    @apply bg-gray-800 rounded-lg shadow-lg px-6 py-8;
+}
+
 
 /* Animação fade-in com movimento */
 @keyframes fadeInMove {

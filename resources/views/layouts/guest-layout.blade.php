@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TimeLove - Tela do criador</title>
+    <title>{{ config('app.name', 'TimeLove') }} - Autenticação</title>
     @vite('resources/css/app.css')
 </head>
 
