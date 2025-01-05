@@ -34,5 +34,8 @@
     <p class="mt-4 text-center text-sm">Ainda não tem uma conta?
         <a href="{{ route('register') }}" class="text-blue-400 hover:underline">Cadastre-se</a>
     </p>
+    <p class="mt-4 text-center text-sm">
+        <a href="{{ route('landing') }}" class="text-blue-400 hover:underline">Voltar para o Início</a>
+    </p>
 </form>
 @endsection

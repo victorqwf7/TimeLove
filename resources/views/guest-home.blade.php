@@ -1,22 +1,20 @@
 @extends('layouts.guest-layout')
 
 @section('header')
-<!-- Cabeçalho com espaçamento refinado -->
-<div class="flex justify-between items-center px-8 py-4 bg-gray-800 shadow-md">
-    <div class="text-2xl font-bold text-white">
-        TimeLove ❤️
+<div class="flex justify-between items-center px-8 py-4 bg-gradient-to-r from-gray-800 to-gray-900 shadow-md">
+    <!-- Logo -->
+    <div class="text-white text-2xl font-bold flex items-center gap-2">
+        <img src="{{ asset('TimeLove.jpg') }}" alt="Logo"
+            class="w-18 h-16 rounded-lg border-2 border-transparent hover:border-rose-500 transition-all duration-300 shadow-md object-cover">
     </div>
-    <div class="flex items-center gap-4">
-        <a href="{{ route('profile.edit') }}" class="text-gray-300 hover:text-white transition">
-            🧑 Meu Perfil
-        </a>
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-md">
-                Sair
-            </button>
-        </form>
-    </div>
+
+    <!-- Botão de Logout -->
+    <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button class="rounded-full bg-rose-500 hover:bg-rose-600 text-white py-2 px-6 shadow-md transition">
+            Sair
+        </button>
+    </form>
 </div>
 @endsection
 
@@ -26,7 +24,18 @@
 
     <!-- Boas-Vindas -->
     <section class="text-center fade-in">
-        <h1 class="text-4xl md:text-5xl font-bold mb-4">🎉 Bem-vindo(a), {{ auth()->user()->name }}!</h1>
+        @php
+            $gender = auth()->user()->gender ?? 'default';
+            $welcomeMessage = match ($gender) {
+                'male' => 'Bem-vindo',
+                'female' => 'Bem-vinda',
+                default => 'Bem-vindo(a)'
+            };
+        @endphp
+
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">
+            🎉 {{ $welcomeMessage }}, {{ auth()->user()->name }}!
+        </h1>
         <p class="text-lg md:text-xl text-gray-300">
             Aqui estão as cápsulas do tempo compartilhadas com você.
         </p>
@@ -39,9 +48,6 @@
             @forelse ($sharedCapsules as $capsule)
                 <div class="bg-gray-800 p-5 rounded-lg shadow-lg hover:shadow-xl transition transform hover:scale-105">
                     <div class="flex items-center gap-4 mb-4">
-                        <div class="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center">
-                            📸
-                        </div>
                         <div>
                             <h3 class="text-lg font-bold text-white">{{ $capsule->name }}</h3>
                             <p class="text-gray-400">Tema: {{ $capsule->theme }}</p>
@@ -67,21 +73,18 @@
         @if($recentStories->isEmpty())
             <p class="text-center text-gray-400">Nenhuma história recente disponível.</p>
         @else
-            <!-- Container Responsivo -->
-            <div class="grid grid-cols-1 md:flex md:gap-6 md:overflow-x-auto px-4 py-4 snap-x">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 @foreach($recentStories as $story)
-                    <div
-                        class="w-full md:w-48 md:h-48 bg-gray-700 rounded-lg shadow-md snap-center relative overflow-hidden mb-4 md:mb-0">
+                    <div class="bg-gray-700 rounded-lg shadow-md overflow-hidden">
                         @if($story->media_type === 'image')
-                            <img src="{{ asset('storage/' . $story->media_path) }}" alt="Story"
-                                class="w-full h-64 md:h-full object-cover">
+                            <img src="{{ asset('storage/' . $story->media_path) }}" alt="Story" class="w-full h-48 object-cover">
                         @elseif($story->media_type === 'video')
-                            <video controls class="w-full h-64 md:h-full object-cover">
+                            <video controls class="w-full h-48 object-cover">
                                 <source src="{{ asset('storage/' . $story->media_path) }}" type="video/mp4">
                             </video>
                         @endif
-                        <div class="absolute bottom-0 left-0 w-full bg-black bg-opacity-50 text-white text-sm p-2">
-                            {{ $story->description ?? 'Story' }}
+                        <div class="p-4 text-center">
+                            <p class="text-sm text-gray-300">{{ $story->description ?? 'Story' }}</p>
                         </div>
                     </div>
                 @endforeach
@@ -92,14 +95,14 @@
     <!-- Ações Adicionais -->
     <section class="text-center fade-in">
         <h2 class="text-2xl md:text-3xl font-bold mb-6">⚙️ O que mais você pode fazer?</h2>
-        <div class="flex justify-center gap-4">
+        <div class="flex justify-center gap-4 flex-wrap">
             <a href="{{ route('profile.edit') }}"
-                class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition">
+                class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition">
                 🛠️ Editar Perfil
             </a>
             <a href="{{ route('landing') }}"
-                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition">
-                🏠 Ir para a Página Inicial
+                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition">
+                🏠 Página Inicial
             </a>
         </div>
     </section>

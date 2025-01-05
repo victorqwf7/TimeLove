@@ -4,13 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ config('app.name', 'TimeLove') }} - Autenticação</title>
-    @vite('resources/css/app.css')
+    <title>{{ config('app.name', 'TimeLove') }}</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="bg-slate-900 m-4">
+<body class="bg-gray-900 text-white min-h-screen flex flex-col justify-between">
     @yield('header')
     @yield('content')
+    @include('components.footer')
 </body>
 
 </html>

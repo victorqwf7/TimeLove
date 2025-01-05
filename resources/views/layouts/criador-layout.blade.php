@@ -11,6 +11,7 @@
 <body class="bg-slate-900 m-4">
     @yield('header')
     @yield('content')
+    @include('components.footer')
 </body>
 
 </html>

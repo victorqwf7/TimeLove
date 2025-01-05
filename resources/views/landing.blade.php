@@ -2,6 +2,17 @@
 
 @section('content')
 
+<style>
+    details[open] summary {
+        color: #f87171;
+        /* Muda a cor da pergunta aberta */
+    }
+
+    details {
+        transition: all 0.3s ease-in-out;
+    }
+</style>
+
 <!-- 🌟 Seção Hero -->
 <section class="w-full h-screen bg-gray-900 text-white flex items-center justify-center px-4 md:px-8">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center w-full max-w-6xl animate-fade-in">
@@ -27,7 +38,7 @@
         </div>
 
         <!-- Coluna Direita -->
-        <div class="flex justify-center">
+        <div class="flex justify-center mb-20">
             <div
                 class="w-full max-w-md h-96 bg-gray-800 rounded-lg shadow-lg overflow-hidden relative animate-slide-in-right">
                 <img src="{{ asset('landing.jpg') }}" alt="Exemplo Cápsula" class="w-full h-full object-cover">
@@ -62,26 +73,29 @@
     </div>
 </section>
 
-<!-- ❤️ Seção de Depoimentos -->
-<section class="bg-gray-900 py-16 text-white text-center px-8">
-    <h2 class="text-4xl font-bold mb-8">💬 Depoimentos de Usuários</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-        <!-- Depoimento 1 -->
-        <div class="bg-gray-800 rounded-lg p-6 shadow-md">
-            <p class="italic text-gray-300">"TimeLove me ajudou a preservar memórias incríveis do meu aniversário de
-                casamento!"</p>
-            <h4 class="font-bold mt-4">— Ana Silva</h4>
-        </div>
-        <!-- Depoimento 2 -->
-        <div class="bg-gray-800 rounded-lg p-6 shadow-md">
-            <p class="italic text-gray-300">"Com o TimeLove consigo fazer stories que duram pra sempre!"</p>
-            <h4 class="font-bold mt-4">— Lucas Oliveira</h4>
-        </div>
-        <!-- Depoimento 3 -->
-        <div class="bg-gray-800 rounded-lg p-6 shadow-md">
-            <p class="italic text-gray-300">"A experiência de compartilhar cápsulas com meus amigos foi incrível!"</p>
-            <h4 class="font-bold mt-4">— Beatriz Costa</h4>
-        </div>
+<!-- ❓ Seção de Perguntas Frequentes (FAQ) -->
+<section id="faq" class="bg-gray-800 py-16 text-white text-center px-4 md:px-8">
+    <h2 class="text-4xl font-bold mb-8">❓ Perguntas Frequentes</h2>
+    <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+        <details class="bg-gray-700 p-4 rounded-lg shadow-md hover:bg-gray-600 transition">
+            <summary class="font-semibold cursor-pointer text-lg">📦 Como funcionam as cápsulas do tempo?</summary>
+            <p class="mt-2 text-gray-300">Você pode criar cápsulas digitais, adicionar fotos, vídeos e agendar aberturas
+                especiais.</p>
+        </details>
+        <details class="bg-gray-700 p-4 rounded-lg shadow-md hover:bg-gray-600 transition">
+            <summary class="font-semibold cursor-pointer text-lg">🔒 Meus dados são seguros?</summary>
+            <p class="mt-2 text-gray-300">Sim! Utilizamos criptografia avançada para proteger todas as suas informações.
+            </p>
+        </details>
+        <details class="bg-gray-700 p-4 rounded-lg shadow-md hover:bg-gray-600 transition">
+            <summary class="font-semibold cursor-pointer text-lg">📲 Posso acessar pelo celular?</summary>
+            <p class="mt-2 text-gray-300">Claro! O TimeLove é otimizado para dispositivos móveis.</p>
+        </details>
+        <details class="bg-gray-700 p-4 rounded-lg shadow-md hover:bg-gray-600 transition">
+            <summary class="font-semibold cursor-pointer text-lg">🆓 O TimeLove é gratuito?</summary>
+            <p class="mt-2 text-gray-300">Sim! Há uma versão gratuita com todas as funcionalidades principais
+                disponíveis.</p>
+        </details>
     </div>
 </section>
 
@@ -94,5 +108,7 @@
         Cadastre-se Gratuitamente
     </a>
 </section>
+
+
 
 @endsection
