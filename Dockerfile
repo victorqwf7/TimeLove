@@ -1,22 +1,19 @@
-# Usar a imagem oficial do PHP com Apache
-FROM php:8.2-apache
+FROM php:8.2-fpm
 
-# Instalar extensões necessárias
-RUN docker-php-ext-install pdo_mysql
+# Instale dependências
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    unzip \
+    && docker-php-ext-install pdo_pgsql
 
-# Copiar arquivos do Laravel para o contêiner
-COPY . /var/www/html
-
-# Definir diretório de trabalho
+# Configure o ambiente
 WORKDIR /var/www/html
+COPY . .
 
-# Instalar dependências do Composer
-RUN apt-get update && apt-get install -y unzip
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-RUN composer install --no-interaction --optimize-autoloader --no-dev
+# Instale o Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Permissões
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-
-# Configurar a porta padrão
-EXPOSE 80
+# Configure permissões e dependências do Laravel
+RUN composer install --optimize-autoloader --no-dev \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chown -R www-data:www-data /var/www/html
