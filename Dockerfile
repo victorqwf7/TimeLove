@@ -26,6 +26,8 @@ RUN composer install --optimize-autoloader --no-dev \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache \
     && chown -R www-data:www-data /var/www/html
 
+RUN apt-get purge -y apache2 && apt-get autoremove -y
+
 # Configure o Nginx
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/default.conf /etc/nginx/conf.d/default.conf
@@ -34,4 +36,4 @@ COPY docker/default.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
 
 # Comando de inicialização
-CMD ["php-fpm", "-F"]
+CMD ["nginx", "-g", "daemon off;"]
